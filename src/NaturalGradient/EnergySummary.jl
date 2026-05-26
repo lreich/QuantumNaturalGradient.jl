@@ -106,8 +106,14 @@ function effective_sample_nr(Es::EnergySummary)
     if Es.importance_weights === nothing
         return length(Es)
     else
-        error = energy_error(Es)
-        return Es.var / error^2
+        return sum(Es.importance_weights)^2 / sum(Es.importance_weights.^2)
+
+        # error = energy_error(Es)
+
+        # if error ≈ 0.0
+        #     return 1
+        # end
+        # return Es.var / error^2
     end
 end
 
