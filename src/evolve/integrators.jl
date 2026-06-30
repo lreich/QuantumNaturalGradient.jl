@@ -27,11 +27,12 @@ end
 # Euler integrator structure
 mutable struct Euler <: AbstractIntegrator
     lr::Float64
+    lr_tuple::Union{Vector{Tuple{StepRange, Float64}}, Nothing}
     step::Integer
     use_clipping::Bool
     clip_norm::Float64
     clip_val::Float64
-    Euler(;lr=0.05, step=0, use_clipping=false, clip_norm=10.0, clip_val=1.0) = new(lr, step, use_clipping, clip_norm, clip_val)
+    Euler(;lr=0.05, lr_tuple=nothing, step=0, use_clipping=false, clip_norm=10.0, clip_val=1.0) = new(lr, lr_tuple, step, use_clipping, clip_norm, clip_val)
 end
 
 # Euler integrator step function
@@ -44,6 +45,15 @@ function (integrator::Euler)(θ::ParameterTypes, Oks_and_Eks_, mode::String="IMA
     ng = NaturalGradient_timeit_wrapper(θ, Oks_and_Eks_; kwargs...)
     g = get_θdot(ng; θtype)
     if integrator.use_clipping clamp_and_norm!(g, integrator.clip_val, integrator.clip_norm) end
+
+    if integrator.lr_tuple !== nothing
+        for (step_range, lr) in integrator.lr_tuple
+            θ[step_range] .+= lr .* g[step_range]
+        end
+        integrator.step += 1
+        
+        return θ, ng
+    end
 
     θ .+= h .* g
     integrator.step += 1
