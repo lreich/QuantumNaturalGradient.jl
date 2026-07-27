@@ -173,7 +173,7 @@ function tdvp_relative_error(J::Jacobian, Es::EnergySummary, θdot::Vector)
 end
 
 function NaturalGradient_timeit_wrapper(θ, Oks_and_Eks_; kwargs...)
-    if kwargs[:timer] !== nothing
+    if haskey(kwargs, :timer) && kwargs[:timer] !== nothing
         ng = @timeit kwargs[:timer] "NaturalGradient" NaturalGradient(θ, Oks_and_Eks_; kwargs...)
     else
         ng = NaturalGradient(θ, Oks_and_Eks_; kwargs...)

@@ -8,6 +8,11 @@ mutable struct EigenSolver <: AbstractSolver
 end
 
 
+"""
+(solver::AbstractSolver)(M::AbstractMatrix, v::AbstractArray, double::Bool; method=:auto, kwargs...)
+
+returns o = M^-1 v (computed by eigendecomposition)
+"""
 function (solver::EigenSolver)(M::AbstractMatrix, v::AbstractArray)
     #@assert ishermitian(M) "EigenSolver: M is not Hermitian"
     eig = eigen(Hermitian(M))
